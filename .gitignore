@@ -1,0 +1,25 @@
+# Compilação e binários
+bin/
+obj/
+ 
+# IDEs e editores
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+ 
+# Publicação e testes
+publish/
+TestResults/
+coverage/
+ 
+# Configurações locais e segredos
+appsettings.*.json
+!appsettings.json
+secrets.json
+ 
+# Logs e SO
+*.log
+.DS_Store
+Thumbs.db
