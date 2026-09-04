@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\DermaFer360.Dominio\DermaFer360.Dominio.csproj" />
+    <ProjectReference Include="..\DermaFer360.Repositorio\DermaFer360.Repositorio.csproj" />
+    <ProjectReference Include="..\DermaFer360.Service\DermaFer360.Service.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

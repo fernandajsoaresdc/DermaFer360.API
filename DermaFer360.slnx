@@ -1,2 +1,7 @@
 <Solution>
+  <Project Path="DermaFer360.Api/DermaFer360.Api.csproj" />
+  <Project Path="DermaFer360.Aplicacao/DermaFer360.Aplicacao.csproj" />
+  <Project Path="DermaFer360.Dominio/DermaFer360.Dominio.csproj" />
+  <Project Path="DermaFer360.Repositorio/DermaFer360.Repositorio.csproj" />
+  <Project Path="DermaFer360.Service/DermaFer360.Service.csproj" />
 </Solution>
