@@ -7,5 +7,6 @@ public interface IReceitaRepositorio
     Task<Receita> ObterAsync(int receitaId);
     Task DeleteAsync(Receita receita);
     Task<IEnumerable<Receita>> ListarAsync();
+    Task<IEnumerable<Receita>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal);
 }
 

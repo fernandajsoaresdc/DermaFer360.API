@@ -46,4 +46,11 @@ public class ReceitaRepositorio : BaseRepositorio, IReceitaRepositorio
         .ToListAsync();
     }
 
+    public async Task<IEnumerable<Receita>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)
+    {
+        return await _context.Receitas
+        .Where(r => r.DataReceita >= dataInicial && r.DataReceita <= dataFinal)
+        .ToListAsync();
+    }
+
 }

@@ -7,5 +7,6 @@ public interface IDespesaRepositorio
     Task<Despesa> ObterAsync(int despesaId);
     Task DeleteAsync(Despesa despesa);
     Task<IEnumerable<Despesa>> ListarAsync();
+    Task<IEnumerable<Despesa>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal);
 }
 

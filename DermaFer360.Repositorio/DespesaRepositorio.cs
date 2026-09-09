@@ -46,4 +46,11 @@ public class DespesaRepositorio : BaseRepositorio, IDespesaRepositorio
         .ToListAsync();
     }
 
+    public async Task<IEnumerable<Despesa>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)
+{
+    return await _context.Despesas
+        .Where(d => d.DataDespesa >= dataInicial && d.DataDespesa <= dataFinal)
+        .ToListAsync();
+}
+
 }
