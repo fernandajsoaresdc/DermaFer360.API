@@ -1,41 +1,49 @@
+
+using DermaFer360.Aplicacao;
+using DermaFer360.Aplicacao.Interfaces;
+using DataAccess.Repositorio;
+using Microsoft.EntityFrameworkCore;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Controllers
+builder.Services.AddControllers();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Banco de dados SQL Server
+builder.Services.AddDbContext<DermaFer360Context>(options => options.UseSqlServer( builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//Repositórios
+builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
+builder.Services.AddScoped<IReceitaRepositorio, ReceitaRepositorio>();
+builder.Services.AddScoped<IDespesaRepositorio, DespesaRepositorio>();
+
+// Injeção das aplicações
+builder.Services.AddScoped<IUsuarioAplicacao, UsuarioAplicacao>();
+builder.Services.AddScoped<IProdutoAplicacao, ProdutoAplicacao>();
+builder.Services.AddScoped<IReceitaAplicacao, ReceitaAplicacao>();
+builder.Services.AddScoped<IDespesaAplicacao, DespesaAplicacao>();
+builder.Services.AddScoped<IRelatorioAplicacao, RelatorioAplicacao>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+// HTTPS
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// Controllers
+app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

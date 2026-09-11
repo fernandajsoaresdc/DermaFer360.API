@@ -85,8 +85,8 @@ namespace DermaFer360.Aplicacao
             if (receita.PrecoUnitario <= 0)
                 throw new Exception("O valor da receita deve ser maior que zero.");
 
-            if (receita.DataReceita > DateTime.Now)
-                throw new Exception("A data da receita não pode ser futura.");
+            if (receita.DataReceita.Date < DateTime.Now.Date)
+                throw new Exception("A data da receita não pode ser retroativa.");
         }
         #endregion
     }

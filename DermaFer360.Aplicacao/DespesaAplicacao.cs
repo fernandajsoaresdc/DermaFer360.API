@@ -86,8 +86,8 @@ namespace DermaFer360.Aplicacao
                 throw new Exception("O valor da despesa deve ser maior que 0.");
 
 
-            if (despesa.DataDespesa > DateTime.Now)
-                throw new Exception("A data da despesa não pode ser futura.");
+            if (despesa.DataDespesa.Date < DateTime.Now.Date)
+                throw new Exception("A data da despesa não pode ser retroativa.");
         }
         #endregion
     }
