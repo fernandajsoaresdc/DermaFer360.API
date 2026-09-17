@@ -37,7 +37,7 @@ namespace DermaFer360.Api.Controllers
                 };
 
                 var usuarioId = await _usuarioAplicacao.CriarAsync(usuarioDominio);
-                return Ok(new {usuarioId, mensagem = "Usuario cadastrado com sucesso."});
+                return Ok(new { usuarioId, mensagem = "Usuario cadastrado com sucesso." });
             }
             catch (Exception ex)
             {
@@ -126,7 +126,7 @@ namespace DermaFer360.Api.Controllers
             try
             {
                 await _usuarioAplicacao.DeletarAsync(usuarioId);
-                return Ok(new {mensagem = "Usuário removido com sucesso."});
+                return Ok(new { mensagem = "Usuário removido com sucesso." });
             }
             catch (Exception ex)
             {
@@ -158,6 +158,21 @@ namespace DermaFer360.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("ListarCargos")]
+
+        public IActionResult ListarCargos()
+        {
+            var cargos = new List<object>
+            {
+                new { Id = 1, Nome = "Administrador" },
+                new { Id = 2, Nome = "Financeiro" },
+                new { Id = 3, Nome = "Estoque" }
+            };
+
+            return Ok(cargos);
         }
     }
 }

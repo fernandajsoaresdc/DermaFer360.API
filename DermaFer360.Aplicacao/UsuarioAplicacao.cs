@@ -89,6 +89,18 @@ namespace DermaFer360.Aplicacao
             await _usuarioRepositorio.DeleteAsync(usuarioDominio);
         }
 
+        public async Task RestaurarAsync(int usuarioId)
+        {
+            var usuario = await _usuarioRepositorio.ObterAsync(usuarioId);
+
+            if (usuario == null)
+                throw new Exception("Usuário não encontrado.");
+
+            usuario.Restaurar();
+
+            await _usuarioRepositorio.AtualizarAsync(usuario);
+        }
+
         public async Task<IEnumerable<Usuario>> ListarAsync()
         {
             return await _usuarioRepositorio.ListarAsync();

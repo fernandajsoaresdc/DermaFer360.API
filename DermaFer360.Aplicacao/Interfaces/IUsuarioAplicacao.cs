@@ -10,6 +10,7 @@ namespace DermaFer360.Aplicacao.Interfaces
         Task<Usuario> ObterAsync(int usuarioId);
         Task<Usuario> ObterPorEmailAsync(string email);
         Task DeletarAsync(int usuarioId);
+        Task RestaurarAsync(int usuarioId);
         Task<IEnumerable<Usuario>> ListarAsync();
     }
 }
