@@ -20,7 +20,7 @@ namespace DermaFer360.Aplicacao
             var receitas = await _receitaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
             var despesas = await _despesaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
 
-            var totalReceitas = receitas.Sum(r => r.Quantidade * r.PrecoUnitario);//soma da quantidade x preço unitário por receita.
+            var totalReceitas = receitas.Sum(r => r.Quantidade * r.PrecoUnitario);
             var totalDespesas = despesas.Sum(d => d.Valor);
 
             return new RelatorioFinanceiroDTO
