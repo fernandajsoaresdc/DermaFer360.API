@@ -3,6 +3,9 @@ using DermaFer360.Aplicacao;
 using DermaFer360.Aplicacao.Interfaces;
 using DataAccess.Repositorio;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Banco de dados SQL Server
-builder.Services.AddDbContext<DermaFer360Context>(options => options.UseSqlServer( builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DermaFer360Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //Repositórios
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
@@ -29,6 +32,29 @@ builder.Services.AddScoped<IProdutoAplicacao, ProdutoAplicacao>();
 builder.Services.AddScoped<IReceitaAplicacao, ReceitaAplicacao>();
 builder.Services.AddScoped<IDespesaAplicacao, DespesaAplicacao>();
 builder.Services.AddScoped<IRelatorioAplicacao, RelatorioAplicacao>();
+
+builder.Services.AddScoped<IAutenticacaoAplicacao, AutenticacaoAplicacao>();
+
+//JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

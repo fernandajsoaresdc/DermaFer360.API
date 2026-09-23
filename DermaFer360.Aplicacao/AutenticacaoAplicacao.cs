@@ -10,7 +10,7 @@ using System.Text;
 
 
 
-namespace Projeto360.Aplicacao;
+namespace DermaFer360.Aplicacao;
 
 public class AutenticacaoAplicacao : IAutenticacaoAplicacao
 {
