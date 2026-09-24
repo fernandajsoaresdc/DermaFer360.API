@@ -6,7 +6,7 @@ namespace DataAccess.Repositorio;
 public class ProdutoRepositorio : BaseRepositorio, IProdutoRepositorio
 {
     public ProdutoRepositorio(DermaFer360Context context) : base(context)
-    {}
+    { }
 
     public async Task<int> CriarAsync(Produto produto)
     {
@@ -31,18 +31,26 @@ public class ProdutoRepositorio : BaseRepositorio, IProdutoRepositorio
         .FirstOrDefaultAsync();
     }
 
-     public async Task DeleteAsync(Produto produto)
+    public async Task<int> TotalProdutosAsync()
+    {
+        return await _context.Produtos
+            .Where(p => p.Ativo)
+            .CountAsync();
+    }
+
+    public async Task DeleteAsync(Produto produto)
     {
         produto.Ativo = false;
         await _context.SaveChangesAsync();
     }
 
+
     public async Task<IEnumerable<Produto>> ListarAsync()
     {
         return await _context.Produtos
         .AsNoTracking()
-        .Where(u => u.Ativo)
-        .OrderBy(u => u.Nome)
+        .Where(p => p.Ativo)
+        .OrderBy(p => p.Nome)
         .ToListAsync();
     }
 

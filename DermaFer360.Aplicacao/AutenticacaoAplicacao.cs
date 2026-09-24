@@ -46,8 +46,10 @@ public class AutenticacaoAplicacao : IAutenticacaoAplicacao
 
         var claims = new[]
         {
+        
         new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
         new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
+        new Claim("Id", usuario.Id.ToString()),
         new Claim("Nome", usuario.Nome),
         new Claim("Cargo", usuario.Cargo.ToString())
     };
@@ -56,7 +58,7 @@ public class AutenticacaoAplicacao : IAutenticacaoAplicacao
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddHours(
+            expires: DateTime.UtcNow.AddHours(
                 Convert.ToDouble(_configuration["Jwt:ExpirationHours"])),
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(key),

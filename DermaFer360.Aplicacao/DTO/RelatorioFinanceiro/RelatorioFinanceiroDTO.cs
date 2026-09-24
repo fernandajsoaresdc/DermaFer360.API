@@ -11,7 +11,7 @@ public class RelatorioFinanceiroDTO
     public int QuantidadeReceitas { get; set; }
     public int QuantidadeDespesas { get; set;}
 
-    public List<ReceitaDTO> Receitas {get; set; } = new();
-    public List<DespesaDTO> Despesas { get; set; } = new();
+    public List<ReceitaDTO> Receitas {get; set; } = [];
+    public List<DespesaDTO> Despesas { get; set; } = [];
 
 }

@@ -3,7 +3,7 @@ using DermaFer360.Dominio.Entidades;
 using DermaFer360.Api.Models.Resposta;
 using DermaFer360.Api.Models.Requisicao;
 using DermaFer360.Aplicacao.Interfaces;
-using DermaFer360.Aplicacao.DTO; 
+using DermaFer360.Aplicacao.DTO;
 
 namespace DermaFer360.Api.Controllers
 {
@@ -35,6 +35,21 @@ namespace DermaFer360.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpGet]
+        [Route("Dashboard")]
+        public async Task<IActionResult> DashboardAsync([FromQuery] DateTime dataInicial, [FromQuery] DateTime dataFinal)
+        {
+            try
+            {
+                var dashboard = await _relatorioAplicacao.DashboardAsync(dataInicial, dataFinal);
+                return Ok(new { dashboard, mensagem = "Dashboard gerada com sucesso." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

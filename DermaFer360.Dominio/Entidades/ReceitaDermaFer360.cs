@@ -7,7 +7,6 @@ public class Receita
     public Produto Produto { get; set; }
     public int Quantidade { get; set; }
     public decimal PrecoUnitario { get; set; }
-    public decimal ValorTotal => Quantidade * PrecoUnitario;
     public DateTime DataReceita { get; set; }
     public bool Ativo { get; set; }
     public int UsuarioId { get; set; }

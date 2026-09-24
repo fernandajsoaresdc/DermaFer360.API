@@ -25,6 +25,7 @@ public class ReceitaRepositorio : BaseRepositorio, IReceitaRepositorio
     public async Task<Receita> ObterAsync(int receitaId)
     {
         return await _context.Receitas
+        .Include(r => r.Produto)
         .Include(r => r.Usuario)
         .Where(r => r.Id == receitaId)
         .Where(r => r.Ativo)
@@ -41,6 +42,8 @@ public class ReceitaRepositorio : BaseRepositorio, IReceitaRepositorio
     {
         return await _context.Receitas
         .AsNoTracking()
+        .Include(r => r.Produto)
+        .Include(r => r.Usuario)
         .Where(r => r.Ativo)
         .OrderBy(r => r.DataReceita)
         .ToListAsync();
