@@ -49,7 +49,9 @@ public class ReceitaRepositorio : BaseRepositorio, IReceitaRepositorio
     public async Task<IEnumerable<Receita>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)
     {
         return await _context.Receitas
-        .Where(r => r.DataReceita >= dataInicial && r.DataReceita <= dataFinal)
+        .Include(r => r.Produto)
+        .Where(r => r.Ativo && r.DataReceita >= dataInicial && r.DataReceita <= dataFinal)
+        .OrderByDescending(r => r.DataReceita)
         .ToListAsync();
     }
 

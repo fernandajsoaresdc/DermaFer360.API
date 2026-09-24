@@ -49,7 +49,8 @@ public class DespesaRepositorio : BaseRepositorio, IDespesaRepositorio
     public async Task<IEnumerable<Despesa>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)
 {
     return await _context.Despesas
-        .Where(d => d.DataDespesa >= dataInicial && d.DataDespesa <= dataFinal)
+        .Where(d => d.Ativo && d.DataDespesa >= dataInicial && d.DataDespesa <= dataFinal)
+        .OrderByDescending(d => d.DataDespesa)
         .ToListAsync();
 }
 

@@ -19,20 +19,40 @@ namespace DermaFer360.Aplicacao
         {
             var receitas = await _receitaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
             var despesas = await _despesaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
-
-            var totalReceitas = receitas.Sum(r => r.Quantidade * r.PrecoUnitario);
-            var totalDespesas = despesas.Sum(d => d.Valor);
-
-            return new RelatorioFinanceiroDTO
+            var relatorio = new RelatorioFinanceiroDTO
             {
                 DataInicial = dataInicial,
                 DataFinal = dataFinal,
-                TotalReceitas = totalReceitas,
-                TotalDespesas = totalDespesas,
-                Lucro = totalReceitas - totalDespesas,
+
+                TotalReceitas = receitas.Sum(r => r.ValorTotal),
+
+                TotalDespesas = despesas.Sum(d => d.Valor),
+
+                Lucro = receitas.Sum(r => r.ValorTotal) - despesas.Sum(d => d.Valor),
+
                 QuantidadeReceitas = receitas.Count(),
-                QuantidadeDespesas = despesas.Count()
+
+                QuantidadeDespesas = despesas.Count(),
+
+                Receitas = receitas.Select(r => new ReceitaDTO
+                {
+                    Produto = r.Produto.Nome,
+                    Quantidade = r.Quantidade,
+                    PrecoUnitario = r.PrecoUnitario,
+                    ValorTotal = r.ValorTotal,
+                    DataReceita = r.DataReceita
+                }).ToList(),
+
+                Despesas = despesas.Select(d => new DespesaDTO
+                {
+                    Descricao = d.Descricao,
+                    Valor = d.Valor,
+                    DataDespesa = d.DataDespesa
+                }).ToList(),
+
             };
+
+            return relatorio;
         }
     }
 }
