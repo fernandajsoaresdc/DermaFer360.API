@@ -5,9 +5,11 @@ public interface IUsuarioRepositorio
 {
     Task<int> CriarAsync(Usuario usuario);
     Task AtualizarAsync(Usuario usuario);
-    Task <Usuario> ObterAsync(int usuarioId);
+    Task<Usuario> ObterAsync(int usuarioId);
     Task<Usuario> ObterPorEmailAsync(string email);
     Task DeleteAsync(Usuario usuario);
-    Task <IEnumerable<Usuario>> ListarAsync();
-   
+    Task<Usuario> ObterIncluindoInativosAsync(int usuarioId);
+    Task RestaurarAsync(Usuario usuario);
+    Task<IEnumerable<Usuario>> ListarAsync();
+
 }

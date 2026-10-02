@@ -91,7 +91,7 @@ namespace DermaFer360.Aplicacao
 
         public async Task RestaurarAsync(int usuarioId)
         {
-            var usuario = await _usuarioRepositorio.ObterAsync(usuarioId);
+            var usuario = await _usuarioRepositorio.ObterIncluindoInativosAsync(usuarioId);
 
             if (usuario == null)
                 throw new Exception("Usuário não encontrado.");

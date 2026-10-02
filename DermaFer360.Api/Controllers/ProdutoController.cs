@@ -37,11 +37,11 @@ namespace DermaFer360.Api.Controllers
                 };
 
                 var produtoId = await _produtoAplicacao.CriarAsync(produtoDominio);
-                return Ok(new {produtoId, mensagem = "Produto cadastrado com sucesso."});
+                return Ok(new { produtoId, mensagem = "Produto cadastrado com sucesso." });
             }
             catch (Exception ex)
             {
-                 return BadRequest(new { erro = ex.Message, innerErro = ex.InnerException?.Message });
+                return BadRequest(new { erro = ex.Message, innerErro = ex.InnerException?.Message });
             }
 
         }
@@ -58,12 +58,14 @@ namespace DermaFer360.Api.Controllers
                 {
                     Id = produtoDominio.Id,
                     Nome = produtoDominio.Nome,
+                    Descricao = produtoDominio.Descricao,
                     PrecoCusto = produtoDominio.PrecoCusto,
                     PrecoVenda = produtoDominio.PrecoVenda,
+                    Estoque = produtoDominio.Estoque,
                     Ativo = produtoDominio.Ativo
                 };
 
-                return Ok();
+                return Ok(produtoResposta);
             }
             catch (Exception ex)
             {
@@ -105,7 +107,7 @@ namespace DermaFer360.Api.Controllers
             try
             {
                 await _produtoAplicacao.DeletarAsync(produtoId);
-                return Ok(new {mensagem = "Produto removido com sucesso."});
+                return Ok(new { mensagem = "Produto removido com sucesso." });
             }
             catch (Exception ex)
             {
@@ -122,12 +124,14 @@ namespace DermaFer360.Api.Controllers
             {
                 var produtoDominio = await _produtoAplicacao.ListarAsync();
 
-                var produtos = produtoDominio.Select(p => new Produto()
+                var produtos = produtoDominio.Select(p => new ProdutoResposta()
                 {
                     Id = p.Id,
                     Nome = p.Nome,
+                    Descricao = p.Descricao,
                     PrecoCusto = p.PrecoCusto,
                     PrecoVenda = p.PrecoVenda,
+                    Estoque = p.Estoque,
                     Ativo = p.Ativo
                 }).ToList();
 

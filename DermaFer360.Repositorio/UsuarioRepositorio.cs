@@ -7,7 +7,7 @@ namespace DataAccess.Repositorio;
 public class UsuarioRepositorio : BaseRepositorio, IUsuarioRepositorio
 {
     public UsuarioRepositorio(DermaFer360Context context) : base(context)
-    {}
+    { }
 
     public async Task<int> CriarAsync(Usuario usuario)
     {
@@ -45,11 +45,23 @@ public class UsuarioRepositorio : BaseRepositorio, IUsuarioRepositorio
         await _context.SaveChangesAsync();
     }
 
+    public async Task<Usuario> ObterIncluindoInativosAsync(int usuarioId)
+    {
+        return await _context.Usuarios
+            .Where(u => u.Id == usuarioId)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task RestaurarAsync(Usuario usuario)
+    {
+        usuario.Ativo = true;
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<Usuario>> ListarAsync()
     {
         return await _context.Usuarios
         .AsNoTracking()
-        .Where(u => u.Ativo)
         .OrderBy(u => u.Nome)
         .ToListAsync();
     }

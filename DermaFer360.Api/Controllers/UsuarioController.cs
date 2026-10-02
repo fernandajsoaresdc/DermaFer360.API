@@ -63,7 +63,7 @@ namespace DermaFer360.Api.Controllers
                     Ativo = usuarioDominio.Ativo
                 };
 
-                return Ok();
+                return Ok(usuarioResposta);
             }
             catch (Exception ex)
             {
@@ -134,6 +134,21 @@ namespace DermaFer360.Api.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("Restaurar/{usuarioId}")]
+        public async Task<IActionResult> RestaurarAsync([FromRoute] int usuarioId)
+        {
+            try
+            {
+                await _usuarioAplicacao.RestaurarAsync(usuarioId);
+                return Ok(new { mensagem = "Usuário restaurado com sucesso." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet]
         [Route("Listar")]
 
@@ -143,7 +158,7 @@ namespace DermaFer360.Api.Controllers
             {
                 var usuarioDominio = await _usuarioAplicacao.ListarAsync();
 
-                var usuarios = usuarioDominio.Select(u => new Usuario()
+                var usuarios = usuarioDominio.Select(u => new UsuarioResposta()
                 {
                     Id = u.Id,
                     Nome = u.Nome,

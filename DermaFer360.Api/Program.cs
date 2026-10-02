@@ -1,4 +1,3 @@
-
 using DermaFer360.Aplicacao;
 using DermaFer360.Aplicacao.Interfaces;
 using DataAccess.Repositorio;
@@ -56,6 +55,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactApp", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Swagger
@@ -67,6 +75,10 @@ if (app.Environment.IsDevelopment())
 
 // HTTPS
 app.UseHttpsRedirection();
+
+// CORS (antes de Authentication/Authorization)
+app.UseCors("ReactApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -74,4 +86,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

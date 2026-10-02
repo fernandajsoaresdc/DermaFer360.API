@@ -17,7 +17,7 @@ public class UsuarioConfiguracoes : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Ativo).HasColumnName("Ativo").IsRequired(true);
         builder.Property(u => u.Cargo).HasColumnName("Cargo").HasConversion<int>().IsRequired(true);
 
-        builder.HasQueryFilter(u => u.Ativo);
+      
 
     }
 }
