@@ -32,6 +32,7 @@ namespace DermaFer360.Api.Controllers
                     PrecoCusto = produto.PrecoCusto,
                     PrecoVenda = produto.PrecoVenda,
                     UsuarioId = produto.UsuarioId,
+                    Estoque = produto.Estoque,
                     Ativo = true
 
                 };
