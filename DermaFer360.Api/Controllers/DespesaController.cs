@@ -124,7 +124,7 @@ namespace DermaFer360.Api.Controllers
             {
                 var despesaDominio = await _despesaAplicacao.ListarAsync();
 
-                var despesas = despesaDominio.Select(d => new Despesa()
+                var despesas = despesaDominio.Select(d => new DespesaResposta()
                 {
                     Id = d.Id,
                     Descricao = d.Descricao,
