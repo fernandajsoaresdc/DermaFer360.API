@@ -85,8 +85,10 @@ namespace DermaFer360.Api.Controllers
                 {
                     Id = produto.Id,
                     Nome = produto.Nome,
+                    Descricao = produto.Descricao,
                     PrecoCusto = produto.PrecoCusto,
                     PrecoVenda = produto.PrecoVenda,
+                    Estoque = produto.Estoque,
                     Ativo = produto.Ativo
                 };
 

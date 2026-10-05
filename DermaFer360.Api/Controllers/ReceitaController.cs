@@ -65,7 +65,7 @@ namespace DermaFer360.Api.Controllers
                     Ativo = receitaDominio.Ativo
                 };
 
-                return Ok();
+                return Ok(receitaResposta);
             }
             catch (Exception ex)
             {
@@ -126,7 +126,7 @@ namespace DermaFer360.Api.Controllers
             {
                 var receitaDominio = await _receitaAplicacao.ListarAsync();
 
-                var receitas = receitaDominio.Select(r => new Receita()
+                var receitas = receitaDominio.Select(r => new ReceitaResposta()
                 {
                     Id = r.Id,
                     ProdutoId = r.ProdutoId,

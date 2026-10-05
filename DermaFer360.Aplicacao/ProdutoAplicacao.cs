@@ -35,8 +35,10 @@ namespace DermaFer360.Aplicacao
             InformacoesProduto(produto);
 
             produtoDominio.Nome = produto.Nome;
+            produtoDominio.Descricao = produto.Descricao;
             produtoDominio.PrecoCusto = produto.PrecoCusto;
             produtoDominio.PrecoVenda = produto.PrecoVenda;
+            produtoDominio.Estoque = produto.Estoque;
 
             await _produtoRepositorio.AtualizarAsync(produtoDominio);
 
