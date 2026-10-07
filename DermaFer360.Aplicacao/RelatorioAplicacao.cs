@@ -10,16 +10,19 @@ namespace DermaFer360.Aplicacao
         readonly IReceitaRepositorio _receitaRepositorio;
         readonly IDespesaRepositorio _despesaRepositorio;
         readonly IProdutoRepositorio _produtoRepositorio;
+        readonly IRelatorioRepositorio _relatorioRepositorio;
 
-        public RelatorioAplicacao(IReceitaRepositorio receitaRepositorio, IDespesaRepositorio despesaRepositorio, IProdutoRepositorio produtoRepositorio)
+        public RelatorioAplicacao(IReceitaRepositorio receitaRepositorio, IDespesaRepositorio despesaRepositorio, IProdutoRepositorio produtoRepositorio, IRelatorioRepositorio relatorioRepositorio)
         {
             _receitaRepositorio = receitaRepositorio;
             _despesaRepositorio = despesaRepositorio;
             _produtoRepositorio = produtoRepositorio;
+            _relatorioRepositorio = relatorioRepositorio;
         }
 
         public async Task<RelatorioFinanceiroDTO> GerarRelatorioAsync(DateTime dataInicial, DateTime dataFinal)
         {
+            var resumo = await _relatorioRepositorio.ObterResumoAsync(dataInicial, dataFinal);
             var receitas = await _receitaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
             var despesas = await _despesaRepositorio.ListarPorPeriodoAsync(dataInicial, dataFinal);
 
@@ -27,16 +30,11 @@ namespace DermaFer360.Aplicacao
             {
                 DataInicial = dataInicial,
                 DataFinal = dataFinal,
-
-                TotalReceitas = receitas.Sum(r => r.Quantidade * r.PrecoUnitario),
-
-                TotalDespesas = despesas.Sum(d => d.Valor),
-
-                Lucro = receitas.Sum(r => r.Quantidade * r.PrecoUnitario) - despesas.Sum(d => d.Valor),
-
-                QuantidadeReceitas = receitas.Count(),
-
-                QuantidadeDespesas = despesas.Count(),
+                TotalReceitas = resumo.TotalReceitas,
+                TotalDespesas = resumo.TotalDespesas,
+                Lucro = resumo.Lucro,
+                QuantidadeReceitas = resumo.QuantidadeReceitas,
+                QuantidadeDespesas = resumo.QuantidadeDespesas,
 
                 Receitas = receitas.Select(r => new ReceitaDTO
                 {
@@ -71,6 +69,76 @@ namespace DermaFer360.Aplicacao
 
             decimal lucroTotal = receitaTotal - despesaTotal;
 
+
+            var graficoFinanceiro = new List<GraficoFinanceiroDTO>();
+
+            var inicio = dataInicial.Date;
+            var fim = dataFinal.Date;
+
+            var quantidadeDias = (fim - inicio).Days;
+
+            if (quantidadeDias <= 31)
+            {
+                for (var data = inicio; data <= fim; data = data.AddDays(1))
+                {
+                    var receita = receitas
+                        .Where(r => r.DataReceita.Date == data)
+                        .Sum(r => r.Quantidade * r.PrecoUnitario);
+
+                    var despesa = despesas
+                        .Where(d => d.DataDespesa.Date == data)
+                        .Sum(d => d.Valor);
+
+                    graficoFinanceiro.Add(new GraficoFinanceiroDTO
+                    {
+                        Mes = data.ToString("dd/MM/yyyy"),
+                        Receita = receita,
+                        Despesa = despesa
+                    });
+                }
+            }
+            else
+            {
+                var primeiroMes = new DateTime(inicio.Year, inicio.Month, 1);
+                var ultimoMes = new DateTime(fim.Year, fim.Month, 1);
+
+                for (
+                    var mes = primeiroMes;
+                    mes <= ultimoMes;
+                    mes = mes.AddMonths(1)
+                )
+                {
+                    var inicioMes = mes > inicio
+                        ? mes
+                        : inicio;
+
+                    var fimMes = mes.AddMonths(1).AddDays(-1) < fim
+                        ? mes.AddMonths(1).AddDays(-1)
+                        : fim;
+
+                    var receita = receitas
+                        .Where(r =>
+                            r.DataReceita.Date >= inicioMes &&
+                            r.DataReceita.Date <= fimMes
+                        )
+                        .Sum(r => r.Quantidade * r.PrecoUnitario);
+
+                    var despesa = despesas
+                        .Where(d =>
+                            d.DataDespesa.Date >= inicioMes &&
+                            d.DataDespesa.Date <= fimMes
+                        )
+                        .Sum(d => d.Valor);
+
+                    graficoFinanceiro.Add(new GraficoFinanceiroDTO
+                    {
+                        Mes = $"{mes.Month:D2}/{mes.Year}",
+                        Receita = receita,
+                        Despesa = despesa
+                    });
+                }
+            }
+
             var dashboard = new DashboardDTO
             {
                 ReceitaTotal = receitaTotal,
@@ -90,19 +158,7 @@ namespace DermaFer360.Aplicacao
 
                 }).ToList(),
 
-                GraficoFinanceiro = receitas
-                .GroupBy(r => new { r.DataReceita.Year, r.DataReceita.Month })
-                .OrderBy(g => g.Key.Year)
-                .ThenBy(g => g.Key.Month)
-                .Select(g => new GraficoFinanceiroDTO
-                {
-                    Mes = $"{g.Key.Month}/{g.Key.Year}",
-
-                    Receita = g.Sum(r => r.Quantidade * r.PrecoUnitario),
-
-                    Despesa = despesas
-                    .Where(d => d.DataDespesa.Month == g.Key.Month && d.DataDespesa.Year == g.Key.Year).Sum(d => d.Valor)
-                }).ToList()
+                GraficoFinanceiro = graficoFinanceiro
             };
 
             return dashboard;

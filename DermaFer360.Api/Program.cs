@@ -23,6 +23,7 @@ builder.Services.AddDbContext<DermaFer360Context>(options => options.UseSqlServe
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 builder.Services.AddScoped<IReceitaRepositorio, ReceitaRepositorio>();
+builder.Services.AddScoped<IRelatorioRepositorio, RelatorioRepositorio>();
 builder.Services.AddScoped<IDespesaRepositorio, DespesaRepositorio>();
 
 // Injeção das aplicações

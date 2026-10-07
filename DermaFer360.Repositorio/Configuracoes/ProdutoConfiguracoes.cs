@@ -13,13 +13,13 @@ public class ProdutoConfiguracoes : IEntityTypeConfiguration<Produto>
         builder.Property(p => p.Id).HasColumnName("ProdutoId");
         builder.Property(p => p.Nome).HasColumnName("Nome").IsRequired(true);
         builder.Property(p => p.Descricao).HasColumnName("Descricao").IsRequired(true);
-        builder.Property(p => p.PrecoCusto).HasColumnName("PrecoCusto").IsRequired(true);
-        builder.Property(p => p.PrecoVenda).HasColumnName("PrecoVenda").IsRequired(true);
+        builder.Property(p => p.PrecoCusto).HasColumnName("PrecoCusto").IsRequired(true).HasPrecision(18, 2);
+        builder.Property(p => p.PrecoVenda).HasColumnName("PrecoVenda").IsRequired(true).HasPrecision(18, 2);
         builder.Property(p => p.Ativo).HasColumnName("Ativo").IsRequired(true);
         builder.Property(p => p.Estoque).HasColumnName("Estoque").IsRequired(true);
 
         builder.HasOne(p => p.Usuario)
-        .WithMany()
+        .WithMany(u =>u.Produtos)
         .HasForeignKey(p => p.UsuarioId)
         .IsRequired();
 

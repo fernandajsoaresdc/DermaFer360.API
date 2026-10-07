@@ -16,7 +16,7 @@ namespace DermaFer360.Repositorio.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -90,24 +90,21 @@ namespace DermaFer360.Repositorio.Migrations
                         .HasColumnName("Nome");
 
                     b.Property<decimal>("PrecoCusto")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("PrecoCusto");
 
                     b.Property<decimal>("PrecoVenda")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("PrecoVenda");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UsuarioId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UsuarioId");
-
-                    b.HasIndex("UsuarioId1");
 
                     b.ToTable("Produtos", (string)null);
                 });
@@ -171,12 +168,14 @@ namespace DermaFer360.Repositorio.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
                         .HasColumnName("Email");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("Nome");
 
                     b.Property<string>("Senha")
@@ -210,14 +209,10 @@ namespace DermaFer360.Repositorio.Migrations
             modelBuilder.Entity("DermaFer360.Dominio.Entidades.Produto", b =>
                 {
                     b.HasOne("DermaFer360.Dominio.Entidades.Usuario", "Usuario")
-                        .WithMany()
+                        .WithMany("Produtos")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("DermaFer360.Dominio.Entidades.Usuario", null)
-                        .WithMany("Produtos")
-                        .HasForeignKey("UsuarioId1");
 
                     b.Navigation("Usuario");
                 });

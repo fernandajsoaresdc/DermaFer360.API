@@ -1,6 +1,9 @@
 using DermaFer360.Dominio.Entidades;
 using System.Net.Mail;
 using DermaFer360.Aplicacao.Interfaces;
+using System.Text.RegularExpressions;
+using System.Net.Mail;
+
 
 
 namespace DermaFer360.Aplicacao
@@ -127,7 +130,14 @@ namespace DermaFer360.Aplicacao
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                    return false;
+
+                if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    return false;
+
                 var enderecoEletronico = new MailAddress(email);
+
                 return enderecoEletronico.Address == email;
             }
             catch
@@ -135,6 +145,19 @@ namespace DermaFer360.Aplicacao
                 return false;
             }
         }
+
+        //         private static bool EmailValidar(string email)
+        // {
+        //     try
+        //     {
+        //         var enderecoEletronico = new MailAddress(email);
+        //         return enderecoEletronico.Address == email;
+        //     }
+        //     catch
+        //     {
+        //         return false;
+        //     }
+        // }
         #endregion
     }
 }
