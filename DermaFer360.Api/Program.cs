@@ -12,9 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Controllers
 builder.Services.AddControllers();
 
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.ParameterLocation.Header,
+        Description = "Digite o token JWT. Exemplo: Bearer {seu_token}"
+    });
+
+    options.AddSecurityRequirement(document =>
+        new Microsoft.OpenApi.OpenApiSecurityRequirement
+        {
+            [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+        });
+});
 
 // Banco de dados SQL Server
 builder.Services.AddDbContext<DermaFer360Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -34,6 +52,12 @@ builder.Services.AddScoped<IDespesaAplicacao, DespesaAplicacao>();
 builder.Services.AddScoped<IRelatorioAplicacao, RelatorioAplicacao>();
 
 builder.Services.AddScoped<IAutenticacaoAplicacao, AutenticacaoAplicacao>();
+
+builder.Services.AddHttpClient<IIAAplicacao, IAAplicacao>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:11434/");
+    client.Timeout = TimeSpan.FromMinutes(5);
+});
 
 //JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -2,7 +2,6 @@ using DermaFer360.Dominio.Entidades;
 using System.Net.Mail;
 using DermaFer360.Aplicacao.Interfaces;
 using System.Text.RegularExpressions;
-using System.Net.Mail;
 
 
 
