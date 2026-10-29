@@ -34,7 +34,6 @@ namespace DermaFer360.Aplicacao
             - Markup é um índice utilizado para formar preços.
 
             EXEMPLOS:
-            - Identifique os exemplos numéricos como hipotéticos.
             - Use reais (R$) nos exemplos brasileiros.
             - Nunca apresente valores inventados como dados reais do DermaFer360.
 
