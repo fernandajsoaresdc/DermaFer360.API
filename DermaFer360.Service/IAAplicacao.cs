@@ -1,7 +1,11 @@
+using System;
 using System.Globalization;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DermaFer360.Aplicacao.Interfaces;
 
 namespace DermaFer360.Service
@@ -18,25 +22,42 @@ namespace DermaFer360.Service
             "setembro", "outubro", "novembro", "dezembro"
         };
 
-        public IAAplicacao(HttpClient httpClient,IRelatorioAplicacao relatorioAplicacao)
+        public IAAplicacao(HttpClient httpClient, IRelatorioAplicacao relatorioAplicacao)
         {
             _httpClient = httpClient;
             _relatorioAplicacao = relatorioAplicacao;
         }
 
-        public async Task<string> PerguntarAsync(string pergunta,string contextoFinanceiro = null)
+        public async Task<string> PerguntarAsync(string pergunta, string contextoFinanceiro = null)
         {
             if (string.IsNullOrWhiteSpace(pergunta))
                 return "Digite uma pergunta.";
 
             string mensagemUsuario = pergunta;
 
-     
-            bool perguntaFinanceira = Regex.IsMatch(mensagemUsuario,@"\b(relatório|relatorio|relatórios|relatorios|faturamento|resultado financeiro|receitas?|despesas?|lucro|prejuízo|prejuizo|margem de lucro|fluxo de caixa|quanto faturou|quanto lucrou|quanto vendeu|total financeiro)\b",RegexOptions.IgnoreCase);
+          
+            bool perguntaConceitual = Regex.IsMatch(mensagemUsuario, @"\b(o que é|o que são|o que significa|conceito de|defina|como calcular)\b", RegexOptions.IgnoreCase);
 
+         
+            bool possuiPeriodo = TentarIdentificarPeriodo(mensagemUsuario, out DateTime inicio, out DateTime fim);
+
+           
+            bool perguntaFinanceira = Regex.IsMatch(mensagemUsuario,
+                @"\b(relatório|relatorio|relatórios|relatorios|" +
+                @"faturamento|resultado financeiro|" +
+                @"receitas?|despesas?|lucro|prejuízo|prejuizo|" +
+                @"margem de lucro|quanto faturou|quanto lucrou|" +
+                @"quanto vendeu|total financeiro)\b",
+                RegexOptions.IgnoreCase
+            );
+
+           
+            perguntaFinanceira = perguntaFinanceira && (!perguntaConceitual || possuiPeriodo);
+
+           
             if (perguntaFinanceira)
             {
-                if (!TentarIdentificarPeriodo(mensagemUsuario,out DateTime inicio,out DateTime fim))
+                if (!possuiPeriodo)
                 {
                     return "Para consultar os dados financeiros, informe o período na pergunta. Exemplo: Qual foi o lucro em outubro de 2026?";
                 }
@@ -76,24 +97,19 @@ namespace DermaFer360.Service
                 mensagemUsuario += "\n\nContexto financeiro:\n" + contextoFinanceiro;
             }
 
-            
+          
             var instrucao = """
-                # PAPEL
+                Você é a DermaFer IA, assistente financeira do
+                sistema DermaFer360, utilizado por uma empresa
+                de dermocosméticos.
 
-                Você é a DermaFer IA, assistente financeira do sistema
-                DermaFer360, utilizado pelo setor financeiro de uma
-                empresa de dermocosméticos.
-
-                # IDIOMA E ESTILO
-
+                IDIOMA E COMPORTAMENTO:
                 - Responda sempre em português do Brasil.
-                - Utilize linguagem profissional, didática e objetiva.
+                - Seja profissional, didática e objetiva.
                 - Prefira respostas curtas e claras.
-                - Utilize valores monetários no formato brasileiro.
-                - Apresente fórmulas quando realizar cálculos.
+                - Utilize valores no formato R$ 1.250,50.
 
-                # CONCEITOS FINANCEIROS
-
+                CONCEITOS FINANCEIROS:
                 - Receita: valor obtido com vendas ou serviços.
                 - Custo: gasto para fabricar ou adquirir produtos.
                 - Despesa: gasto administrativo ou operacional.
@@ -103,54 +119,48 @@ namespace DermaFer360.Service
                 - Markup: índice aplicado sobre o custo para formar
                   o preço de venda.
 
-                Nunca confunda receita, custo, despesa, lucro e margem.
-
-                # DADOS OFICIAIS
-
-                - Utilize exclusivamente os dados oficiais quando
-                  receber um relatório do DermaFer360.
+                DADOS OFICIAIS:
+                - Utilize os valores do relatório oficial recebido.
                 - Nunca invente receitas, despesas ou lucros.
                 - Não altere os valores fornecidos.
-                - Se a informação não estiver disponível, informe isso.
-                - Não afirme que consultou o banco quando não ocorreu
-                  uma consulta.
-                - Diferencie dados reais de exemplos ilustrativos.
+                - Não confunda lucro com receita.
+                - Se uma informação não estiver disponível,
+                  informe claramente essa limitação.
+                - Não afirme que consultou o banco sem que isso
+                  tenha acontecido.
 
-                # RESPOSTAS
-
-                - Perguntas conceituais: explique o conceito e,
-                  quando necessário, apresente exemplo ilustrativo.
+                RESPOSTAS:
+                - Perguntas conceituais: explique o conceito.
                 - Perguntas financeiras: utilize os dados oficiais.
-                - Cálculos: apresente fórmula, valores e resultado.
-                - Comparações: destaque diferenças e variações.
+                - Cálculos: apresente fórmula e resultado.
+                - Comparações: destaque as diferenças.
 
-                # LIMITES
-
-                - Apoie decisões financeiras, sem substituir
-                  contador, auditor ou consultor tributário.
-                - Em questões fiscais, recomende validação profissional.
+                LIMITES:
+                - Não substitua contador ou auditor.
+                - Recomende validação profissional em questões fiscais.
                 - Não responda assuntos fora de finanças e do
                   sistema DermaFer360.
-                - Nunca solicite ou repita senhas e tokens.
+                - Nunca solicite senhas ou tokens.
 
-                # OBJETIVO
-
+                OBJETIVO:
                 Apoiar a governança financeira do DermaFer360,
-                fornecendo informações claras, corretas e verificáveis.
+                oferecendo informações claras e verificáveis.
                 """;
 
-            
+       
             var requisicao = new
             {
                 model = "phi3:mini",
                 stream = false,
                 keep_alive = "30m",
+
                 options = new
                 {
-                    num_predict = 250,
+                    num_predict = 120,
                     num_ctx = 2048,
                     temperature = 0.2
                 },
+
                 messages = new[]
                 {
                     new
@@ -166,18 +176,25 @@ namespace DermaFer360.Service
                 }
             };
 
+         
+            var resposta = await _httpClient.PostAsJsonAsync("api/chat", requisicao);
+
+            string conteudoResposta = await resposta.Content.ReadAsStringAsync();
+
             
-            var resposta = await _httpClient.PostAsJsonAsync("api/chat",requisicao);
+            if (!resposta.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Ollama retornou HTTP {(int)resposta.StatusCode}: {conteudoResposta}", null, resposta.StatusCode);
+            }
 
-            resposta.EnsureSuccessStatusCode();
-
-            var json = await resposta.Content.ReadFromJsonAsync<OllamaResposta>();
+         
+            var json = JsonSerializer.Deserialize<OllamaResposta>(conteudoResposta);
 
             return json?.Message?.Content?? "Não foi possível obter uma resposta da DermaFer IA.";
         }
 
-       
-        private static bool TentarIdentificarPeriodo(string pergunta,out DateTime inicio,out DateTime fim)
+      
+        private static bool TentarIdentificarPeriodo(string pergunta, out DateTime inicio, out DateTime fim)
         {
             inicio = default;
             fim = default;
@@ -207,7 +224,9 @@ namespace DermaFer360.Service
                 );
 
                 if (!dataInicialValida || !dataFinalValida || inicio.Date > fim.Date)
+                {
                     return false;
+                }
 
                 inicio = inicio.Date;
                 fim = fim.Date.AddDays(1).AddTicks(-1);
@@ -215,7 +234,7 @@ namespace DermaFer360.Service
                 return true;
             }
 
-            
+        
             var mesAno = Regex.Match(pergunta, @"\b(janeiro|fevereiro|março|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+(\d{4})\b", RegexOptions.IgnoreCase);
 
             if (!mesAno.Success)
@@ -226,7 +245,9 @@ namespace DermaFer360.Service
                 .Replace("marco", "março");
 
             if (!int.TryParse(mesAno.Groups[2].Value, out int ano))
+            {
                 return false;
+            }
 
             int mes = Array.IndexOf(Meses, nomeMes) + 1;
 
@@ -242,6 +263,7 @@ namespace DermaFer360.Service
             return true;
         }
 
+      
         private class OllamaResposta
         {
             [JsonPropertyName("message")]
