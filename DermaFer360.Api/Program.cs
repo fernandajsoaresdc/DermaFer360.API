@@ -1,10 +1,12 @@
 using DermaFer360.Aplicacao;
 using DermaFer360.Aplicacao.Interfaces;
+using DermaFer360.Service;
 using DataAccess.Repositorio;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 
 
 var builder = WebApplication.CreateBuilder(args);

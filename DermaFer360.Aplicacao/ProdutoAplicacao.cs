@@ -20,25 +20,36 @@ namespace DermaFer360.Aplicacao
             if (produto == null)
                 throw new Exception("Produto não pode ser vazio.");
 
-            InformacoesProduto(produto);
+            var produtoDominio = new Produto()
+            {
+                Nome = produto.Nome,
+                Descricao = produto.Descricao,
+                PrecoCusto = produto.PrecoCusto,
+                PrecoVenda = produto.PrecoVenda,
+                UsuarioId = produto.UsuarioId,
+                Estoque = produto.Estoque,
+                Ativo = true
+            };
 
-            return await _produtoRepositorio.CriarAsync(produto);
+            InformacoesProduto(produtoDominio);
+
+            return await _produtoRepositorio.CriarAsync(produtoDominio);
         }
 
         public async Task AtualizarAsync(Produto produto)
         {
             var produtoDominio = await _produtoRepositorio.ObterAsync(produto.Id);
 
-            if(produtoDominio == null)
-            throw new Exception("Produto não encontrado.");
-
-            InformacoesProduto(produto);
+            if (produtoDominio == null)
+                throw new Exception("Produto não encontrado.");
 
             produtoDominio.Nome = produto.Nome;
             produtoDominio.Descricao = produto.Descricao;
             produtoDominio.PrecoCusto = produto.PrecoCusto;
             produtoDominio.PrecoVenda = produto.PrecoVenda;
             produtoDominio.Estoque = produto.Estoque;
+
+            InformacoesProduto(produtoDominio);
 
             await _produtoRepositorio.AtualizarAsync(produtoDominio);
 
@@ -48,25 +59,46 @@ namespace DermaFer360.Aplicacao
         {
             var produtoDominio = await _produtoRepositorio.ObterAsync(produtoId);
 
-            if(produtoDominio == null)
-            throw new Exception("Produto não encontrado.");
+            if (produtoDominio == null)
+                throw new Exception("Produto não encontrado.");
 
-            return produtoDominio;
+                  return new Produto()
+                {
+                    Id = produtoDominio.Id,
+                    Nome = produtoDominio.Nome,
+                    Descricao = produtoDominio.Descricao,
+                    PrecoCusto = produtoDominio.PrecoCusto,
+                    PrecoVenda = produtoDominio.PrecoVenda,
+                    Estoque = produtoDominio.Estoque,
+                    Ativo = produtoDominio.Ativo
+                };
         }
 
         public async Task DeletarAsync(int produtoId)
         {
             var produtoDominio = await _produtoRepositorio.ObterAsync(produtoId);
 
-            if(produtoDominio == null)
-            throw new Exception("Produto não encontrado.");
+            if (produtoDominio == null)
+                throw new Exception("Produto não encontrado.");
 
             await _produtoRepositorio.DeleteAsync(produtoDominio);
         }
 
         public async Task<IEnumerable<Produto>> ListarAsync()
         {
-            return await _produtoRepositorio.ListarAsync();
+              var produto = await _produtoRepositorio.ListarAsync();
+
+              return produto.Select(p => new Produto()
+                {
+                    Id = p.Id,
+                    Nome = p.Nome,
+                    Descricao = p.Descricao,
+                    PrecoCusto = p.PrecoCusto,
+                    PrecoVenda = p.PrecoVenda,
+                    Estoque = p.Estoque,
+                    Ativo = p.Ativo
+                }).ToList();
+
         }
 
 

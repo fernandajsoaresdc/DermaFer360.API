@@ -2,6 +2,7 @@ using DermaFer360.Dominio.Entidades;
 using System.Net.Mail;
 using DermaFer360.Aplicacao.Interfaces;
 using System.Text.RegularExpressions;
+using DermaFer360.Aplicacao.DTOs;
 
 
 
@@ -22,12 +23,21 @@ namespace DermaFer360.Aplicacao
             if (usuario == null)
                 throw new Exception("Usuário não pode ser vazio.");
 
-            InformacoesUsuario(usuario);
+            var usuarioDominio = new Usuario()
+            {
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                Senha = usuario.Senha,
+                Cargo = usuario.Cargo,
+                Ativo = true
+            };
+
+            InformacoesUsuario(usuarioDominio);
 
             if (string.IsNullOrEmpty(usuario.Senha))
                 throw new Exception("A senha não pode ser vazia.");
 
-            return await _usuarioRepositorio.CriarAsync(usuario);
+            return await _usuarioRepositorio.CriarAsync(usuarioDominio);
         }
 
         public async Task AtualizarAsync(Usuario usuario)
@@ -37,23 +47,23 @@ namespace DermaFer360.Aplicacao
             if (usuarioDominio == null)
                 throw new Exception("Usuário não encontrado.");
 
-            InformacoesUsuario(usuario);
-
             usuarioDominio.Nome = usuario.Nome;
             usuarioDominio.Email = usuario.Email;
             usuarioDominio.Cargo = usuario.Cargo;
 
+            InformacoesUsuario(usuarioDominio);
+
             await _usuarioRepositorio.AtualizarAsync(usuarioDominio);
         }
 
-        public async Task AlterarSenhaAsync(Usuario usuario, string senhaAntiga)
+        public async Task AlterarSenhaAsync(Usuario usuario)
         {
             var usuarioDominio = await _usuarioRepositorio.ObterAsync(usuario.Id);
 
             if (usuarioDominio == null)
                 throw new Exception("Usuário não encontrado.");
 
-            if (usuarioDominio.Senha != senhaAntiga)
+            if (usuarioDominio.Senha != usuario.SenhaAntiga)
                 throw new Exception("Senha antiga inválida.");
 
             usuarioDominio.Senha = usuario.Senha;
@@ -68,7 +78,14 @@ namespace DermaFer360.Aplicacao
             if (usuarioDominio == null)
                 throw new Exception("Usuário não encontrado.");
 
-            return usuarioDominio;
+            return new Usuario()
+            {
+                Id = usuarioDominio.Id,
+                Nome = usuarioDominio.Nome,
+                Email = usuarioDominio.Email,
+                Cargo = usuarioDominio.Cargo,
+                Ativo = usuarioDominio.Ativo
+            };
         }
 
         public async Task<Usuario> ObterPorEmailAsync(string email)
@@ -105,7 +122,26 @@ namespace DermaFer360.Aplicacao
 
         public async Task<IEnumerable<Usuario>> ListarAsync()
         {
-            return await _usuarioRepositorio.ListarAsync();
+            var usuario = await _usuarioRepositorio.ListarAsync();
+            return usuario.Select(u => new Usuario()
+            {
+                Id = u.Id,
+                Nome = u.Nome,
+                Email = u.Email,
+                Cargo = u.Cargo,
+                Ativo = u.Ativo
+            }).ToList();
+        }
+
+        public IEnumerable<CargoUsuario> ListarCargos()
+        {
+               return new List<CargoUsuario>
+            {
+                new() { Id = 1, Nome = "Administrador" },
+                new() { Id = 2, Nome = "Financeiro" },
+                new() { Id = 3, Nome = "Estoque" }
+            };
+         
         }
 
 
@@ -145,18 +181,6 @@ namespace DermaFer360.Aplicacao
             }
         }
 
-        //         private static bool EmailValidar(string email)
-        // {
-        //     try
-        //     {
-        //         var enderecoEletronico = new MailAddress(email);
-        //         return enderecoEletronico.Address == email;
-        //     }
-        //     catch
-        //     {
-        //         return false;
-        //     }
-        // }
         #endregion
     }
 }

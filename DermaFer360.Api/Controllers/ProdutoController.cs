@@ -21,23 +21,11 @@ namespace DermaFer360.Api.Controllers
         [HttpPost]
         [Route("Criar")]
 
-        public async Task<IActionResult> CriarAsync([FromBody] ProdutoCriar produto)
+        public async Task<IActionResult> CriarAsync([FromBody] Produto produto)
         {
             try
             {
-                var produtoDominio = new Produto()
-                {
-                    Nome = produto.Nome,
-                    Descricao = produto.Descricao,
-                    PrecoCusto = produto.PrecoCusto,
-                    PrecoVenda = produto.PrecoVenda,
-                    UsuarioId = produto.UsuarioId,
-                    Estoque = produto.Estoque,
-                    Ativo = true
-
-                };
-
-                var produtoId = await _produtoAplicacao.CriarAsync(produtoDominio);
+                var produtoId = await _produtoAplicacao.CriarAsync(produto);
                 return Ok(new { produtoId, mensagem = "Produto cadastrado com sucesso." });
             }
             catch (Exception ex)
@@ -54,18 +42,7 @@ namespace DermaFer360.Api.Controllers
         {
             try
             {
-                var produtoDominio = await _produtoAplicacao.ObterAsync(produtoId);
-                var produtoResposta = new ProdutoResposta()
-                {
-                    Id = produtoDominio.Id,
-                    Nome = produtoDominio.Nome,
-                    Descricao = produtoDominio.Descricao,
-                    PrecoCusto = produtoDominio.PrecoCusto,
-                    PrecoVenda = produtoDominio.PrecoVenda,
-                    Estoque = produtoDominio.Estoque,
-                    Ativo = produtoDominio.Ativo
-                };
-
+                var produtoResposta = await _produtoAplicacao.ObterAsync(produtoId);
                 return Ok(produtoResposta);
             }
             catch (Exception ex)
@@ -77,22 +54,12 @@ namespace DermaFer360.Api.Controllers
         [HttpPut]
         [Route("Atualizar")]
 
-        public async Task<IActionResult> AtualizarAsync([FromBody] ProdutoAtualizar produto)
+        public async Task<IActionResult> AtualizarAsync([FromBody] Produto produto)
         {
             try
             {
-                var produtoDominio = new Produto()
-                {
-                    Id = produto.Id,
-                    Nome = produto.Nome,
-                    Descricao = produto.Descricao,
-                    PrecoCusto = produto.PrecoCusto,
-                    PrecoVenda = produto.PrecoVenda,
-                    Estoque = produto.Estoque,
-                    Ativo = produto.Ativo
-                };
 
-                await _produtoAplicacao.AtualizarAsync(produtoDominio);
+                await _produtoAplicacao.AtualizarAsync(produto);
                 return Ok("Produto atualizado com sucesso.");
             }
             catch (Exception ex)
@@ -126,19 +93,7 @@ namespace DermaFer360.Api.Controllers
             try
             {
                 var produtoDominio = await _produtoAplicacao.ListarAsync();
-
-                var produtos = produtoDominio.Select(p => new ProdutoResposta()
-                {
-                    Id = p.Id,
-                    Nome = p.Nome,
-                    Descricao = p.Descricao,
-                    PrecoCusto = p.PrecoCusto,
-                    PrecoVenda = p.PrecoVenda,
-                    Estoque = p.Estoque,
-                    Ativo = p.Ativo
-                }).ToList();
-
-                return Ok(produtos);
+                return Ok(produtoDominio);
             }
             catch (Exception ex)
             {

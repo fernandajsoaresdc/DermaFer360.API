@@ -18,9 +18,19 @@ namespace DermaFer360.Aplicacao
             if (despesa == null)
                 throw new Exception("Despesa não pode ser vazia.");
 
-            InformacoesDespesa(despesa);
+            var despesaDominio = new Despesa()
+            {
+                Descricao = despesa.Descricao,
+                Valor = despesa.Valor,
+                DataDespesa = despesa.DataDespesa,
+                UsuarioId = despesa.UsuarioId,
+                Ativo = true
 
-            return await _despesaRepositorio.CriarAsync(despesa);
+            };
+
+            InformacoesDespesa(despesaDominio);
+
+            return await _despesaRepositorio.CriarAsync(despesaDominio);
         }
 
         public async Task AtualizarAsync(Despesa despesa)
@@ -30,16 +40,19 @@ namespace DermaFer360.Aplicacao
             if (despesaDominio == null)
                 throw new Exception("Despesa não encontrada.");
 
-            InformacoesDespesa(despesa);
 
             despesaDominio.Descricao = despesa.Descricao;
             despesaDominio.UsuarioId = despesa.UsuarioId;
             despesaDominio.Valor = despesa.Valor;
             despesaDominio.DataDespesa = despesa.DataDespesa;
 
+            InformacoesDespesa(despesaDominio);
+
             await _despesaRepositorio.AtualizarAsync(despesaDominio);
 
         }
+
+
 
         public async Task<Despesa> ObterAsync(int despesaId)
         {
@@ -48,8 +61,17 @@ namespace DermaFer360.Aplicacao
             if (despesaDominio == null)
                 throw new Exception("Despesa não encontrada.");
 
-            return despesaDominio;
+            return new Despesa()
+            {
+                Id = despesaDominio.Id,
+                Descricao = despesaDominio.Descricao,
+                Valor = despesaDominio.Valor,
+                DataDespesa = despesaDominio.DataDespesa,
+                UsuarioId = despesaDominio.UsuarioId,
+                Ativo = despesaDominio.Ativo
+            };
         }
+
 
         public async Task DeletarAsync(int despesaId)
         {
@@ -61,9 +83,20 @@ namespace DermaFer360.Aplicacao
             await _despesaRepositorio.DeleteAsync(despesaDominio);
         }
 
+
         public async Task<IEnumerable<Despesa>> ListarAsync()
         {
-            return await _despesaRepositorio.ListarAsync();
+            var despesas = await _despesaRepositorio.ListarAsync();
+
+            return despesas.Select(d => new Despesa()
+            {
+                Id = d.Id,
+                Descricao = d.Descricao,
+                Valor = d.Valor,
+                DataDespesa = d.DataDespesa,
+                UsuarioId = d.UsuarioId,
+                Ativo = d.Ativo
+            }).ToList();
         }
 
         public async Task<IEnumerable<Despesa>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)

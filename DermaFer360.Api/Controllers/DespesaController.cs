@@ -21,21 +21,12 @@ namespace DermaFer360.Api.Controllers
         [HttpPost]
         [Route("Criar")]
 
-        public async Task<IActionResult> CriarAsync([FromBody] DespesaCriar despesa)
+        public async Task<IActionResult> CriarAsync([FromBody] Despesa despesa)
         {
             try
             {
-                var despesaDominio = new Despesa()
-                {
-                    Descricao = despesa.Descricao,
-                    Valor = despesa.Valor,
-                    DataDespesa = despesa.DataDespesa,
-                    UsuarioId = despesa.UsuarioId,
-                    Ativo = true
-
-                };
-
-                var despesaId = await _despesaAplicacao.CriarAsync(despesaDominio);
+               
+                var despesaId = await _despesaAplicacao.CriarAsync(despesa);
                 return Ok(new { despesaId, mensagem = "Despesa cadastrada com sucesso." });
             }
             catch (Exception ex)
@@ -47,23 +38,12 @@ namespace DermaFer360.Api.Controllers
 
         [HttpGet]
         [Route("Obter/{despesaId}")]
-
         public async Task<IActionResult> ObterAsync([FromRoute] int despesaId)
         {
             try
             {
-                var despesaDominio = await _despesaAplicacao.ObterAsync(despesaId);
-                var despesaResposta = new DespesaResposta()
-                {
-                    Id = despesaDominio.Id,
-                    Descricao = despesaDominio.Descricao,
-                    Valor = despesaDominio.Valor,
-                    DataDespesa = despesaDominio.DataDespesa,
-                    UsuarioId = despesaDominio.UsuarioId,
-                    Ativo = true
-                };
-
-                return Ok();
+                var despesaResposta = await _despesaAplicacao.ObterAsync(despesaId);
+                return Ok(despesaResposta);
             }
             catch (Exception ex)
             {
@@ -74,22 +54,11 @@ namespace DermaFer360.Api.Controllers
         [HttpPut]
         [Route("Atualizar")]
 
-        public async Task<IActionResult> AtualizarAsync([FromBody] DespesaAtualizar despesa)
+        public async Task<IActionResult> AtualizarAsync([FromBody] Despesa despesa)
         {
             try
             {
-                var despesaDominio = new Despesa()
-                {
-                    Id = despesa.Id,
-                    Descricao = despesa.Descricao,
-                    Valor = despesa.Valor,
-                    DataDespesa = despesa.DataDespesa,
-                    UsuarioId = despesa.UsuarioId,
-                    Ativo = true
-
-                };
-
-                await _despesaAplicacao.AtualizarAsync(despesaDominio);
+                await _despesaAplicacao.AtualizarAsync(despesa);
                 return Ok("Despesa atualizada com sucesso.");
             }
             catch (Exception ex)
@@ -124,17 +93,7 @@ namespace DermaFer360.Api.Controllers
             {
                 var despesaDominio = await _despesaAplicacao.ListarAsync();
 
-                var despesas = despesaDominio.Select(d => new DespesaResposta()
-                {
-                    Id = d.Id,
-                    Descricao = d.Descricao,
-                    Valor = d.Valor,
-                    DataDespesa = d.DataDespesa,
-                    UsuarioId = d.UsuarioId,
-                    Ativo = true
-                }).ToList();
-
-                return Ok(despesas);
+                return Ok(despesaDominio);
             }
             catch (Exception ex)
             {

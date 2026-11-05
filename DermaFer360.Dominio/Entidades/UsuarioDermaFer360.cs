@@ -8,6 +8,7 @@ namespace DermaFer360.Dominio.Entidades
         public string Nome { get; set; }
         public string Email { get; set; }
         public string Senha { get; set; }
+        public string SenhaAntiga {get; set; }
         public CargoFinanceiro Cargo { get; set; }
         public bool Ativo { get; set; }
         public ICollection<Produto> Produtos { get; set; } = new List<Produto>();

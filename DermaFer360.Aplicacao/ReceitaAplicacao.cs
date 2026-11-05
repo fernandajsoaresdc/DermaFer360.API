@@ -18,7 +18,18 @@ namespace DermaFer360.Aplicacao
             if (receita == null)
                 throw new Exception("Receita não pode ser vazia.");
 
-            InformacoesReceita(receita);
+            var receitaDominio = new Receita()
+            {
+                ProdutoId = receita.ProdutoId,
+                Quantidade = receita.Quantidade,
+                PrecoUnitario = receita.PrecoUnitario,
+                DataReceita = receita.DataReceita,
+                UsuarioId = receita.UsuarioId,
+                Ativo = true
+
+            };
+
+            InformacoesReceita(receitaDominio);
 
             return await _receitaRepositorio.CriarAsync(receita);
         }
@@ -30,12 +41,12 @@ namespace DermaFer360.Aplicacao
             if (receitaDominio == null)
                 throw new Exception("Receita não encontrada.");
 
-            InformacoesReceita(receita);
-
             receitaDominio.ProdutoId = receita.ProdutoId;
             receitaDominio.UsuarioId = receita.UsuarioId;
             receitaDominio.PrecoUnitario = receita.PrecoUnitario;
             receitaDominio.DataReceita = receita.DataReceita;
+
+            InformacoesReceita(receitaDominio);
 
             await _receitaRepositorio.AtualizarAsync(receitaDominio);
 
@@ -48,7 +59,18 @@ namespace DermaFer360.Aplicacao
             if (receitaDominio == null)
                 throw new Exception("Receita não encontrada.");
 
-            return receitaDominio;
+            return new Receita()
+            {
+                Id = receitaDominio.Id,
+                ProdutoId = receitaDominio.ProdutoId,
+                Quantidade = receitaDominio.Quantidade,
+                PrecoUnitario = receitaDominio.PrecoUnitario,
+                DataReceita = receitaDominio.DataReceita,
+                UsuarioId = receitaDominio.UsuarioId,
+                Ativo = receitaDominio.Ativo
+            };
+
+
         }
 
         public async Task DeletarAsync(int receitaId)
@@ -63,7 +85,17 @@ namespace DermaFer360.Aplicacao
 
         public async Task<IEnumerable<Receita>> ListarAsync()
         {
-            return await _receitaRepositorio.ListarAsync();
+            var receita = await _receitaRepositorio.ListarAsync();
+            return receita.Select(r => new Receita()
+            {
+                Id = r.Id,
+                ProdutoId = r.ProdutoId,
+                Quantidade = r.Quantidade,
+                PrecoUnitario = r.PrecoUnitario,
+                DataReceita = r.DataReceita,
+                UsuarioId = r.UsuarioId,
+                Ativo = r.Ativo
+            }).ToList();
         }
 
         public async Task<IEnumerable<Receita>> ListarPorPeriodoAsync(DateTime dataInicial, DateTime dataFinal)

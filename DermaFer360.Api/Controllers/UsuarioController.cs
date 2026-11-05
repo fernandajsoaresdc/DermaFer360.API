@@ -22,21 +22,12 @@ namespace DermaFer360.Api.Controllers
         [HttpPost]
         [Route("Criar")]
 
-        public async Task<IActionResult> CriarAsync([FromBody] UsuarioCriar usuario)
+        public async Task<IActionResult> CriarAsync([FromBody] Usuario usuario)
         {
             try
             {
-                var usuarioDominio = new Usuario()
-                {
-                    Nome = usuario.Nome,
-                    Email = usuario.Email,
-                    Senha = usuario.Senha,
-                    Cargo = usuario.Cargo,
-                    Ativo = true
 
-                };
-
-                var usuarioId = await _usuarioAplicacao.CriarAsync(usuarioDominio);
+                var usuarioId = await _usuarioAplicacao.CriarAsync(usuario);
                 return Ok(new { usuarioId, mensagem = "Usuario cadastrado com sucesso." });
             }
             catch (Exception ex)
@@ -53,16 +44,7 @@ namespace DermaFer360.Api.Controllers
         {
             try
             {
-                var usuarioDominio = await _usuarioAplicacao.ObterAsync(usuarioId);
-                var usuarioResposta = new UsuarioResposta()
-                {
-                    Id = usuarioDominio.Id,
-                    Nome = usuarioDominio.Nome,
-                    Email = usuarioDominio.Email,
-                    Cargo = usuarioDominio.Cargo,
-                    Ativo = usuarioDominio.Ativo
-                };
-
+                var usuarioResposta = await _usuarioAplicacao.ObterAsync(usuarioId);
                 return Ok(usuarioResposta);
             }
             catch (Exception ex)
@@ -74,20 +56,11 @@ namespace DermaFer360.Api.Controllers
         [HttpPut]
         [Route("Atualizar")]
 
-        public async Task<IActionResult> AtualizarAsync([FromBody] UsuarioAtualizar usuario)
+        public async Task<IActionResult> AtualizarAsync([FromBody] Usuario usuario)
         {
             try
             {
-                var usuarioDominio = new Usuario()
-                {
-                    Id = usuario.Id,
-                    Nome = usuario.Nome,
-                    Email = usuario.Email,
-                    Cargo = usuario.Cargo,
-                    Ativo = usuario.Ativo
-                };
-
-                await _usuarioAplicacao.AtualizarAsync(usuarioDominio);
+                await _usuarioAplicacao.AtualizarAsync(usuario);
                 return Ok("Usuário atualizado com sucesso.");
             }
             catch (Exception ex)
@@ -99,17 +72,11 @@ namespace DermaFer360.Api.Controllers
         [HttpPut]
         [Route("AlterarSenha")]
 
-        public async Task<IActionResult> AlterarSenhaAsync([FromBody] UsuarioAlterarSenha usuario)
+        public async Task<IActionResult> AlterarSenhaAsync([FromBody] Usuario usuario)
         {
             try
             {
-                var usuarioDominio = new Usuario()
-                {
-                    Id = usuario.Id,
-                    Senha = usuario.Senha
-                };
-
-                await _usuarioAplicacao.AlterarSenhaAsync(usuarioDominio, usuario.SenhaAntiga);
+                await _usuarioAplicacao.AlterarSenhaAsync(usuario);
                 return Ok(new { mensagem = "Senha alterada com sucesso." });
             }
             catch (Exception ex)
@@ -157,17 +124,7 @@ namespace DermaFer360.Api.Controllers
             try
             {
                 var usuarioDominio = await _usuarioAplicacao.ListarAsync();
-
-                var usuarios = usuarioDominio.Select(u => new UsuarioResposta()
-                {
-                    Id = u.Id,
-                    Nome = u.Nome,
-                    Email = u.Email,
-                    Cargo = u.Cargo,
-                    Ativo = u.Ativo
-                }).ToList();
-
-                return Ok(usuarios);
+                return Ok(usuarioDominio);
             }
             catch (Exception ex)
             {
@@ -180,14 +137,7 @@ namespace DermaFer360.Api.Controllers
 
         public IActionResult ListarCargos()
         {
-            var cargos = new List<object>
-            {
-                new { Id = 1, Nome = "Administrador" },
-                new { Id = 2, Nome = "Financeiro" },
-                new { Id = 3, Nome = "Estoque" }
-            };
-
-            return Ok(cargos);
+            return Ok(_usuarioAplicacao.ListarCargos());
         }
     }
 }

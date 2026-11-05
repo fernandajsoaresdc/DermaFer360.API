@@ -9,6 +9,7 @@
    <ItemGroup>
     <ProjectReference Include="..\DermaFer360.Dominio\DermaFer360.Dominio.csproj" />
     <ProjectReference Include="..\DermaFer360.Repositorio\DermaFer360.Repositorio.csproj" />
+    <ProjectReference Include="..\DermaFer360.Aplicacao\DermaFer360.Aplicacao.csproj" />
   </ItemGroup>
 
 </Project>

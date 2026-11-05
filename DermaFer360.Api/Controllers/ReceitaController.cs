@@ -21,22 +21,12 @@ namespace DermaFer360.Api.Controllers
         [HttpPost]
         [Route("Criar")]
 
-        public async Task<IActionResult> CriarAsync([FromBody] ReceitaCriar receita)
+        public async Task<IActionResult> CriarAsync([FromBody] Receita receita)
         {
             try
             {
-                var receitaDominio = new Receita()
-                {
-                    ProdutoId = receita.ProdutoId,
-                    Quantidade = receita.Quantidade,
-                    PrecoUnitario = receita.PrecoUnitario,
-                    DataReceita = receita.DataReceita,
-                    UsuarioId = receita.UsuarioId,
-                    Ativo = true
 
-                };
-
-                var receitaId = await _receitaAplicacao.CriarAsync(receitaDominio);
+                var receitaId = await _receitaAplicacao.CriarAsync(receita);
                 return Ok(new {receitaId, mensagem = "Receita cadastrada com sucesso."});
             }
             catch (Exception ex)
@@ -53,18 +43,7 @@ namespace DermaFer360.Api.Controllers
         {
             try
             {
-                var receitaDominio = await _receitaAplicacao.ObterAsync(receitaId);
-                var receitaResposta = new ReceitaResposta()
-                {
-                    Id = receitaDominio.Id,
-                    ProdutoId = receitaDominio.ProdutoId,
-                    Quantidade = receitaDominio.Quantidade,
-                    PrecoUnitario = receitaDominio.PrecoUnitario,
-                    DataReceita = receitaDominio.DataReceita,
-                    UsuarioId = receitaDominio.UsuarioId,
-                    Ativo = receitaDominio.Ativo
-                };
-
+                var receitaResposta = await _receitaAplicacao.ObterAsync(receitaId);
                 return Ok(receitaResposta);
             }
             catch (Exception ex)
@@ -76,22 +55,12 @@ namespace DermaFer360.Api.Controllers
         [HttpPut]
         [Route("Atualizar")]
 
-        public async Task<IActionResult> AtualizarAsync([FromBody] ReceitaAtualizar receita)
+        public async Task<IActionResult> AtualizarAsync([FromBody] Receita receita)
         {
             try
             {
-                var receitaDominio = new Receita()
-                {
-                    Id = receita.Id,
-                    ProdutoId = receita.ProdutoId,
-                    Quantidade = receita.Quantidade,
-                    PrecoUnitario = receita.PrecoUnitario,
-                    DataReceita = receita.DataReceita,
-                    UsuarioId = receita.UsuarioId,
-                    Ativo = receita.Ativo
-                };
+                await _receitaAplicacao.AtualizarAsync(receita);
 
-                await _receitaAplicacao.AtualizarAsync(receitaDominio);
                 return Ok("Receita atualizada com sucesso.");
             }
             catch (Exception ex)
@@ -126,18 +95,7 @@ namespace DermaFer360.Api.Controllers
             {
                 var receitaDominio = await _receitaAplicacao.ListarAsync();
 
-                var receitas = receitaDominio.Select(r => new ReceitaResposta()
-                {
-                    Id = r.Id,
-                    ProdutoId = r.ProdutoId,
-                    Quantidade = r.Quantidade,
-                    PrecoUnitario = r.PrecoUnitario,
-                    DataReceita = r.DataReceita,
-                    UsuarioId = r.UsuarioId,
-                    Ativo = r.Ativo
-                }).ToList();
-
-                return Ok(receitas);
+                return Ok(receitaDominio);
             }
             catch (Exception ex)
             {
