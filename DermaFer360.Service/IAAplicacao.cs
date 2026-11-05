@@ -35,13 +35,13 @@ namespace DermaFer360.Service
 
             string mensagemUsuario = pergunta;
 
-          
+
             bool perguntaConceitual = Regex.IsMatch(mensagemUsuario, @"\b(o que é|o que são|o que significa|conceito de|defina|como calcular)\b", RegexOptions.IgnoreCase);
 
-         
+
             bool possuiPeriodo = TentarIdentificarPeriodo(mensagemUsuario, out DateTime inicio, out DateTime fim);
 
-           
+
             bool perguntaFinanceira = Regex.IsMatch(mensagemUsuario,
                 @"\b(relatório|relatorio|relatórios|relatorios|" +
                 @"faturamento|resultado financeiro|" +
@@ -51,10 +51,8 @@ namespace DermaFer360.Service
                 RegexOptions.IgnoreCase
             );
 
-           
-            perguntaFinanceira = perguntaFinanceira && (!perguntaConceitual || possuiPeriodo);
 
-           
+            perguntaFinanceira = perguntaFinanceira && (!perguntaConceitual || possuiPeriodo);
             if (perguntaFinanceira)
             {
                 if (!possuiPeriodo)
@@ -64,40 +62,89 @@ namespace DermaFer360.Service
 
                 var relatorio = await _relatorioAplicacao.GerarRelatorioAsync(inicio, fim);
 
+         
+                bool solicitarRelatorioCompleto = Regex.IsMatch(mensagemUsuario, @"\b(relatório|relatorio|demonstrativo|resumo financeiro|visão geral)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarQuantidadeReceitas = Regex.IsMatch(mensagemUsuario, @"\b(quantidade|número|numero)\b.*\b(receitas?)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarQuantidadeDespesas = Regex.IsMatch(mensagemUsuario, @"\b(quantidade|número|numero)\b.*\b(despesas?)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarReceitas = Regex.IsMatch(mensagemUsuario, @"\b(receitas?|faturamento|quanto vendeu|quanto faturou)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarDespesas = Regex.IsMatch(mensagemUsuario, @"\b(despesas?)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarLucro = Regex.IsMatch(mensagemUsuario, @"\b(lucro|prejuízo|prejuizo|quanto lucrou|resultado financeiro)\b", RegexOptions.IgnoreCase);
+
+                bool solicitarMargem = Regex.IsMatch(mensagemUsuario, @"\b(margem de lucro)\b", RegexOptions.IgnoreCase);
+
                 string receitas = relatorio.TotalReceitas.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
 
                 string despesas = relatorio.TotalDespesas.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
 
                 string lucro = relatorio.Lucro.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
 
-                string dadosFinanceiros = $"""
-                    RELATÓRIO OFICIAL DO DERMAFER360
+                string periodo = $"{inicio:dd/MM/yyyy} a {fim:dd/MM/yyyy}";
 
-                    Período: {inicio:dd/MM/yyyy} a {fim:dd/MM/yyyy}
+              
+                if (solicitarRelatorioCompleto)
+                {
+                    return
+                        $"RELATÓRIO FINANCEIRO — DERMAFER360\n\n" +
+                        $"Período: {periodo}\n\n" +
+                        $"Total de receitas: {receitas}\n" +
+                        $"Total de despesas: {despesas}\n" +
+                        $"Lucro informado pelo relatório: {lucro}\n\n" +
+                        $"Quantidade de receitas: {relatorio.QuantidadeReceitas}\n" +
+                        $"Quantidade de despesas: {relatorio.QuantidadeDespesas}";
+                }
 
-                    Total de receitas: {receitas}
-                    Total de despesas: {despesas}
-                    Lucro informado pelo relatório: {lucro}
+                
+                if (solicitarQuantidadeReceitas)
+                {
+                    return $"No período de {periodo}, foram registradas " + $"{relatorio.QuantidadeReceitas} receitas.";
+                }
 
-                    Quantidade de receitas: {relatorio.QuantidadeReceitas}
-                    Quantidade de despesas: {relatorio.QuantidadeDespesas}
-                    """;
+              
+                if (solicitarQuantidadeDespesas)
+                {
+                    return $"No período de {periodo}, foram registradas " + $"{relatorio.QuantidadeDespesas} despesas.";
+                }
 
-                mensagemUsuario += $"""
+              
+                if (solicitarMargem)
+                {
+                    return "A consulta da margem de lucro ainda precisa ser implementada " + "com uma regra de cálculo validada no módulo financeiro.";
+                }
 
-                    {dadosFinanceiros}
+                if (solicitarReceitas)
+                {
+                    return $"O total de receitas no período de {periodo} foi de {receitas}.";
+                }
 
-                    Analise exclusivamente os dados oficiais apresentados.
-                    Responda à pergunta utilizando os valores do relatório.
-                    Não invente informações.
-                    """;
+            
+                if (solicitarDespesas)
+                {
+                    return $"O total de despesas no período de {periodo} foi de {despesas}.";
+                }
+
+              
+                if (solicitarLucro)
+                {
+                    return $"O resultado financeiro informado pelo relatório para o período " + $"de {periodo} foi de {lucro}.";
+                }
+
+             
+                return
+                    $"RELATÓRIO FINANCEIRO — DERMAFER360\n\n" +
+                    $"Período: {periodo}\n\n" +
+                    $"Total de receitas: {receitas}\n" +
+                    $"Total de despesas: {despesas}\n" +
+                    $"Lucro informado pelo relatório: {lucro}\n\n" +
+                    $"Quantidade de receitas: {relatorio.QuantidadeReceitas}\n" +
+                    $"Quantidade de despesas: {relatorio.QuantidadeDespesas}";
             }
-            else if (!string.IsNullOrWhiteSpace(contextoFinanceiro))
-            {
-                mensagemUsuario += "\n\nContexto financeiro:\n" + contextoFinanceiro;
-            }
 
-          
+
             var instrucao = """
                 Você é a DermaFer IA, assistente financeira do
                 sistema DermaFer360, utilizado por uma empresa
@@ -147,7 +194,7 @@ namespace DermaFer360.Service
                 oferecendo informações claras e verificáveis.
                 """;
 
-       
+
             var requisicao = new
             {
                 model = "phi3:mini",
@@ -176,24 +223,24 @@ namespace DermaFer360.Service
                 }
             };
 
-         
+
             var resposta = await _httpClient.PostAsJsonAsync("api/chat", requisicao);
 
             string conteudoResposta = await resposta.Content.ReadAsStringAsync();
 
-            
+
             if (!resposta.IsSuccessStatusCode)
             {
                 throw new HttpRequestException($"Ollama retornou HTTP {(int)resposta.StatusCode}: {conteudoResposta}", null, resposta.StatusCode);
             }
 
-         
+
             var json = JsonSerializer.Deserialize<OllamaResposta>(conteudoResposta);
 
-            return json?.Message?.Content?? "Não foi possível obter uma resposta da DermaFer IA.";
+            return json?.Message?.Content ?? "Não foi possível obter uma resposta da DermaFer IA.";
         }
 
-      
+
         private static bool TentarIdentificarPeriodo(string pergunta, out DateTime inicio, out DateTime fim)
         {
             inicio = default;
@@ -234,7 +281,7 @@ namespace DermaFer360.Service
                 return true;
             }
 
-        
+
             var mesAno = Regex.Match(pergunta, @"\b(janeiro|fevereiro|março|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+(\d{4})\b", RegexOptions.IgnoreCase);
 
             if (!mesAno.Success)
@@ -263,7 +310,7 @@ namespace DermaFer360.Service
             return true;
         }
 
-      
+
         private class OllamaResposta
         {
             [JsonPropertyName("message")]
