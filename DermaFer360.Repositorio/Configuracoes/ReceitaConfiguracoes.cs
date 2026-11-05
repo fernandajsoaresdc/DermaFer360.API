@@ -11,9 +11,9 @@ public class ReceitaConfiguracoes : IEntityTypeConfiguration<Receita>
         builder.ToTable("Receitas").HasKey(r => r.Id);
 
         builder.Property(r => r.Id).HasColumnName("ReceitaId");
-         builder.Property(r => r.Quantidade).HasColumnName("Quantidade").IsRequired(true);
-        builder.Property(r => r.PrecoUnitario).HasColumnName("PrecoUnitario").HasColumnType("decimal(18,2)").IsRequired(true);
-        builder.Property(r => r.DataReceita).HasColumnName("DataReceita").IsRequired(true);
+         builder.Property(r => r.Quantidade).HasColumnName("Quantidade").IsRequired(true).HasMaxLength(100);
+        builder.Property(r => r.PrecoUnitario).HasColumnName("PrecoUnitario").HasColumnType("decimal(18,2)").IsRequired(true).HasMaxLength(100);
+        builder.Property(r => r.DataReceita).HasColumnName("DataReceita").IsRequired(true).HasMaxLength(100);
         builder.Property(r => r.Ativo).HasColumnName("Ativo").IsRequired(true);
 
         builder.HasOne(r => r.Produto)

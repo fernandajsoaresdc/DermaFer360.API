@@ -12,10 +12,10 @@ public class UsuarioConfiguracoes : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.Id).HasColumnName("UsuarioId");
         builder.Property(u => u.Nome).HasColumnName("Nome").IsRequired(true).HasMaxLength(100);
-        builder.Property(u => u.Email).HasColumnName("Email").IsRequired(true).HasMaxLength(254);
-        builder.Property(u => u.Senha).HasColumnName("Senha").IsRequired(true);
+        builder.Property(u => u.Email).HasColumnName("Email").IsRequired(true).HasMaxLength(100);
+        builder.Property(u => u.Senha).HasColumnName("Senha").IsRequired(true).HasMaxLength(50);
         builder.Property(u => u.Ativo).HasColumnName("Ativo").IsRequired(true);
-        builder.Property(u => u.Cargo).HasColumnName("Cargo").HasConversion<int>().IsRequired(true);
+        builder.Property(u => u.Cargo).HasColumnName("Cargo").HasConversion<int>().IsRequired(true).HasMaxLength(100);
 
         builder.Ignore(u => u.SenhaAntiga);
       

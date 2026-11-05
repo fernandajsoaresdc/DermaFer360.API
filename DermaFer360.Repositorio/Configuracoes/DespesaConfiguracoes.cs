@@ -11,9 +11,9 @@ public class DespesaConfiguracoes : IEntityTypeConfiguration<Despesa>
         builder.ToTable("Despesas").HasKey(d => d.Id);
 
         builder.Property(d => d.Id).HasColumnName("DespesaId");
-        builder.Property(d => d.Descricao).HasColumnName("Descricao").IsRequired(true);
-        builder.Property(d => d.Valor).HasColumnName("Valor").HasColumnType("decimal(18,2)").IsRequired(true);
-        builder.Property(d => d.DataDespesa).HasColumnName("DataDespesa").IsRequired(true);
+        builder.Property(d => d.Descricao).HasColumnName("Descricao").IsRequired(true).HasMaxLength(300);
+        builder.Property(d => d.Valor).HasColumnName("Valor").HasColumnType("decimal(18,2)").IsRequired(true).HasMaxLength(100);
+        builder.Property(d => d.DataDespesa).HasColumnName("DataDespesa").IsRequired(true).HasMaxLength(100);
         builder.Property(d => d.Ativo).HasColumnName("Ativo").IsRequired(true);
 
 

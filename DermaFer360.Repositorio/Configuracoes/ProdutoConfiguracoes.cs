@@ -11,12 +11,12 @@ public class ProdutoConfiguracoes : IEntityTypeConfiguration<Produto>
         builder.ToTable("Produtos").HasKey(p => p.Id);
 
         builder.Property(p => p.Id).HasColumnName("ProdutoId");
-        builder.Property(p => p.Nome).HasColumnName("Nome").IsRequired(true);
-        builder.Property(p => p.Descricao).HasColumnName("Descricao").IsRequired(true);
-        builder.Property(p => p.PrecoCusto).HasColumnName("PrecoCusto").IsRequired(true).HasPrecision(18, 2);
-        builder.Property(p => p.PrecoVenda).HasColumnName("PrecoVenda").IsRequired(true).HasPrecision(18, 2);
+        builder.Property(p => p.Nome).HasColumnName("Nome").IsRequired(true).HasMaxLength(100);
+        builder.Property(p => p.Descricao).HasColumnName("Descricao").IsRequired(true).HasMaxLength(300);
+        builder.Property(p => p.PrecoCusto).HasColumnName("PrecoCusto").IsRequired(true).HasPrecision(18, 2).HasMaxLength(100);
+        builder.Property(p => p.PrecoVenda).HasColumnName("PrecoVenda").IsRequired(true).HasPrecision(18, 2).HasMaxLength(100);
         builder.Property(p => p.Ativo).HasColumnName("Ativo").IsRequired(true);
-        builder.Property(p => p.Estoque).HasColumnName("Estoque").IsRequired(true);
+        builder.Property(p => p.Estoque).HasColumnName("Estoque").IsRequired(true).HasMaxLength(100);
 
         builder.HasOne(p => p.Usuario)
         .WithMany(u =>u.Produtos)
