@@ -58,7 +58,7 @@ builder.Services.AddScoped<IAutenticacaoAplicacao, AutenticacaoAplicacao>();
 builder.Services.AddHttpClient<IIAAplicacao, IAAplicacao>(client =>
 {
     client.BaseAddress = new Uri("http://localhost:11434/");
-    client.Timeout = TimeSpan.FromMinutes(1);
+    client.Timeout = TimeSpan.FromMinutes(4);
 });
 
 //JWT
